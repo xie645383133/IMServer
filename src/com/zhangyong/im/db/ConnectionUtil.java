@@ -6,6 +6,8 @@ import java.sql.SQLException;
 
 /**
  * Created by zhangyong on 2015/5/14.
+ * 用Jdbc测试数据库连接<br/>
+ * <strong>该类在本工程中不用, 仅仅用于测试数据库连接</strong>
  */
 public class ConnectionUtil {
     public static Connection getConnection() {
