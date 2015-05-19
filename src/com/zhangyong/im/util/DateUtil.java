@@ -1,14 +1,11 @@
 package com.zhangyong.im.util;
 
-import android.util.Log;
-import org.springframework.util.StringUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Created by zhangyong on 2015/5/15.
@@ -48,7 +45,6 @@ public class DateUtil {
             date = dateFormat.parse(str);
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.e("DateUtil.getDateFromHumanReadStr", e.toString());
         }
         return date;
     }
@@ -64,7 +60,6 @@ public class DateUtil {
             date = timeFormat.parse(str);
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.e("DateUtil.getDateFromHumanReadStr", e.toString());
         }
         return date;
     }
@@ -87,7 +82,6 @@ public class DateUtil {
             date = calendar.getTime();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("DateUtil.getDateFromHumanReadStr", e.toString());
         }
         return date;
     }
