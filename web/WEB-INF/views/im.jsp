@@ -6,8 +6,9 @@
 <head>
     <title>IM</title>
     <style type="text/css">
-        .continer{
-            width: 800px; height: 600px;
+        .continer {
+            width: 800px;
+            height: 600px;
             margin: 0px auto 100px auto;
             background: #E0E0E0;
         }
@@ -19,27 +20,32 @@
 </head>
 <body>
 
-    <!-- 消息数量 -->
-    <div id="zongShuLiang" class="continer"></div>
+<!-- 消息数量 -->
+<div id="zongShuLiang" class="continer"></div>
 
-    <!-- 成功率 -->
-    <div id="chengGongLv_JiXing" class="continer"></div>
-    <div id="chengGongLv_QuDao" class="continer"></div>
-    <div id="chengGongLv_LeiXing" class="continer"></div>
+<!-- 成功率 -->
+<div id="chengGongLv_JiXing_HX" class="continer"></div>
+<div id="chengGongLv_JiXing_RY" class="continer"></div>
+<div id="chengGongLv_JiXing_YTX" class="continer"></div>
+
+<div id="chengGongLv_QuDao" class="continer"></div>
+<div id="chengGongLv_LeiXing" class="continer"></div>
 </body>
 
 
 <!-- 消息总数量 -->
 <script type="text/javascript">
     var colors = Highcharts.getOptions().colors;
-    var pros = [];
-    var prosNums = [];
+    var pros = [];          // 产品
+    var prosNums = [];      // 产品总数量
     <c:forEach items="${proNum}" var="pro">
-        pros[pros.length] = '${pro.product}';
-        prosNums[prosNums.length] = parseInt('${pro.totalNum}');
+    pros[pros.length] = '${pro.product}';
+    prosNums[prosNums.length] = parseInt('${pro.totalNum}');
     </c:forEach>
+
+
     var dataPros = [];
-    for(var i=0; i<prosNums.length; ++i){
+    for (var i = 0; i < prosNums.length; ++i) {
         dataPros[i] = {};
         dataPros[i].y = prosNums[i];
         dataPros[i].color = colors[i];
@@ -62,12 +68,12 @@
         }
 
         var chart = $('#zongShuLiang').highcharts({
-            chart: { type: 'column'},
-            title: { text: '即时通信数据统计'},
-            subtitle: { text: '消息总数量'},
-            xAxis: { categories: categories},
+            chart: {type: 'column'},
+            title: {text: '即时通信数据统计'},
+            subtitle: {text: '消息总数量'},
+            xAxis: {categories: categories},
             yAxis: {
-                title: { text: ''}
+                title: {text: ''}
             },
             plotOptions: {
                 column: {
@@ -86,7 +92,8 @@
             },
             tooltip: {
                 formatter: function () {
-                    return this.x + ':<b>' + this.y + '</b><br>';;
+                    return this.x + ':<b>' + this.y + '</b><br>';
+                    ;
                 }
             },
             series: [{
@@ -102,75 +109,96 @@
 </script>
 
 
-<!-- 失败率 -->
+<!-- 机型失败率-环信 -->
 <script type="text/javascript">
-
-    var prodPhoneData = [];
-    var products = [];
+//    var products = [];
+    var hxData = [];
     var phones = [];
 
-    <c:forEach items="${phones}" var="p" varStatus="status">
-        var ind = ${status.index*2};
-        var obj1 = {};
-        obj1.name = '成功';
-        obj1.stack = '${p}';
-        obj1.data = [];
 
-        var obj2 = {};
-        obj2.name = '失败';
-        obj2.stack = '${p}';
-        obj2.data = [];
-
-        prodPhoneData[ind]= obj1;
-        prodPhoneData[ind+1] = obj2;
-    </c:forEach>
     <%--<c:forEach items="${names}" var="n">--%>
-        <%--products[products.length] = '${n.key}';--%>
-
-        <%--<%--alert('${n.key}, ${n.value}');--%>
+        <%--products.push('${n.key}')--%>
     <%--</c:forEach>--%>
 
-    <c:forEach items="${prodPhoneNum}" var="pp" varStatus="status">
-        <%--prodPhoneData[${status.index}].data[${status.index}] = parseInt('${pp.success}');--%>
+    <c:forEach items="${data}" var="d">
+        <c:if test="${d.key eq 'HX'}">
+            <c:forEach items="${d.value}" var="v">
+                var obj = {};
+                obj.name = '${v.name}';
+                obj.data = [];
+                <c:forEach items="${v.data}" var="dd">
+                    obj.data.push(${dd});
+                </c:forEach>
+                hxData.push(obj);
+            </c:forEach>
+        </c:if>
     </c:forEach>
 
-    $(function () {
-        $('#chengGongLv_JiXing').highcharts({
-            chart: { type: 'column'},
-            title: { text: '根据机型统计发送成功率'},
-            xAxis: { categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']},
-            yAxis: {
-                allowDecimals: false,
-                min: 0,
-                title: {
-                    text: ' '
-                }
-            },
 
-            tooltip: {
-                formatter: function() {
-                    return '<b>'+ this.x +'</b><br>'+
-                            this.series.name +': '+ this.y +'<br>'+
-                            '共: '+ this.point.stackTotal;
-                }
+    <c:forEach items="${phones}" var="p">
+        <c:if test="${p.key eq 'HX'}">
+            <c:forEach items="${p.value}" var="v">
+                phones.push('${v}');
+            </c:forEach>
+        </c:if>
+    </c:forEach>
+
+
+
+$(function () {
+    $('#chengGongLv_JiXing_HX').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Stacked column chart'
+        },
+        xAxis: {
+            categories: phones
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Total fruit consumption'
             },
-            plotOptions: {
-                column: {
-                    stacking: 'normal'
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
                 }
-            },
-            colors: ['#4572A7', '#AA4643', '#89A54E', '#80699B', '#3D96AE', '#DB843D', '#92A8CD', '#A47D7C', '#B5CA92'],
-            series: [{
-                name: '成功',
-                data: [5, 3, 4, 7, 2],
-                stack: 'Huawei'
-            }, {
-                name: '失败',
-                data: [3, 4, 4, 2, 5],
-                stack: 'Huawei'
-            }]
-        });
+            }
+        },
+        legend: {
+            align: 'right',
+            x: -70,
+            verticalAlign: 'top',
+            y: 20,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.x +'</b><br/>'+
+                        this.series.name +': '+ this.y +'<br/>'+
+                        'Total: '+ this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                }
+            }
+        },
+        series: hxData
     });
+});
 </script>
 
 </html>
