@@ -22,17 +22,19 @@ public class IMJdbcTemplate{
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public static String defaultBeginTime;            // 默认的查询起始时间  今天的[00:00:00]
-    public static String defaultEndTime;              // 默认的查询结束时间  今天的[23:59:59]
+    public static String defaultBeginTime;            // 默认的查询起始时间  昨天的[00:00:00]
+    public static String defaultEndTime;              // 默认的查询结束时间  昨天的[23:59:59]
 
     static {
         Calendar begin = Calendar.getInstance();
+        begin.add(Calendar.DAY_OF_MONTH, -1);
         begin.set(Calendar.HOUR_OF_DAY, 0);
         begin.set(Calendar.MINUTE, 0);
         begin.set(Calendar.SECOND, 0);
         defaultBeginTime = DateUtil.getHumanReadStr(begin.getTime());
 
         Calendar end = Calendar.getInstance();
+        end.add(Calendar.DAY_OF_MONTH, -1);
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
@@ -49,7 +51,7 @@ public class IMJdbcTemplate{
      * 获取所有产品(HX,RY,YTX,LC)
      * @return ['A','B','C']
      */
-    public List<String> getProejcts() {
+    public List<String> getProducts() {
         String sql = "SELECT DISTINCT product from hxData where product is not null";
         List<String> products = jdbcTemplate.queryForList(sql, String.class);
         if (products == null) {
@@ -131,11 +133,13 @@ public class IMJdbcTemplate{
      * @param endTime
      * @return [{product:'XX',phoneCaption:'XX',totalNum:XX},{}]
      */
-    public List<Map<String, Object>> getTotalByProductPhone( String beginTime, String endTime) {
+    public List<Map<String, Object>> getSendsByProductPhone(String beginTime, String endTime) {
 
-        String sql = "select product, phoneCaption, count(*) totalNum from hxData where phoneCaption is not null " +
-                " and product is not null and CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) " +
-                " AND CAST(? as DATETIME) GROUP BY product, phoneCaption order by product";
+        String sql = "select product, phoneCaption, count(*) totalNum from hxData \n" +
+                "where phoneCaption is not null and product is not null \n" +
+                "and CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+                "AND actionType='SEND'\n" +
+                "GROUP BY product, phoneCaption order by product";
         List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, beginTime, endTime);
         if (maps == null) {
             maps = new ArrayList<>();
@@ -145,27 +149,25 @@ public class IMJdbcTemplate{
 
 
     /**
-     * 获取产品, 手机型号的发送数量
+     * 获取产品, 手机型号的发送成功数量
      * int successFlag
      * @param beginTime
      * @param endTime
      * @return [{product:'XX',phoneCaption:'XX',totalNum:XX},{}]
      */
-    public List<Map<String, Object>> getTotalByProductPhone(int successFlag, String beginTime, String endTime) {
-            String success = null;
-        if (successFlag == Constants.SUCCESS_TRUE) {
-            success = "TRUE";
-        }else if (successFlag == Constants.SUCCESS_FALSE) {
-            success = "FALSE";
+    public int getSuccessByProductPhone(String product, String phone, String beginTime, String endTime) {
+        String sql = "select count(*) totalNum from hxData \n" +
+                "where phoneCaption is not null and product is not null \n" +
+                "AND product=? AND phoneCaption=?\n" +
+                "and CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+                "AND actionType='SEND' and success = 'TRUE'\n" +
+                "GROUP BY product, phoneCaption order by product;";
+        List<Integer> integers = jdbcTemplate.queryForList(sql, Integer.class, product, phone, beginTime, endTime);
+        int successNums = 0;
+        if (integers != null && integers.size() > 0 && integers.get(0) != null) {
+            successNums = integers.get(0);
         }
-        String sql = "select product, phoneCaption, count(*) totalNum from hxData where success = ? AND phoneCaption is not null " +
-                " and product is not null and CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME)" +
-                " AND CAST(? as DATETIME) GROUP BY product, phoneCaption order by product";
-        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, success, beginTime, endTime);
-        if (maps == null) {
-            maps = new ArrayList<>();
-        }
-        return maps;
+        return successNums;
     }
 
 
@@ -407,17 +409,15 @@ public class IMJdbcTemplate{
      * -----------------------------------------------------------------------------------------------------------------
      */
 
-    // TODO
-
     /**
      * 获取根据机型获取发送延迟
      * @param beginTime
      * @param endTime
-     * @return
+     * @return [{product:'xx', phone:'xx', cost:123}]
      */
     public List<Map<String, Object>> getDelayByPhone(String beginTime, String endTime) {
 
-        String sql = "select h1.product, h1.phoneCaption, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+        String sql = "select DISTINCT h1.messageId,h1.product, h1.phoneCaption, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
                 "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
                 "AND h2.phoneCaption is not null and h2.product is not null\n" +
                 "AND CAST(h1.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
@@ -430,18 +430,79 @@ public class IMJdbcTemplate{
     }
 
 
+    /**
+     * 根据渠道获取发送延迟
+     * @param beginTime
+     * @param endTime
+     * @return [{product:'xx', channel:'xx', cost:123}]
+     */
+    public List<Map<String, Object>> getDelayByChannel(String beginTime, String endTime) {
+
+        String sql = "select DISTINCT h1.messageId,h1.product, h1.channel, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+                "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
+                "AND h2.phoneCaption is not null and h2.product is not null\n" +
+                "AND CAST(h1.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+                "ORDER BY h1.product, h1.channel, cost ASC";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql,beginTime, endTime);
+        if (maps == null) {
+            maps = new ArrayList<>();
+        }
+        return maps;
+    }
+
+
+    /**
+     * 根据消息类型获取发送延迟
+     * @param beginTime
+     * @param endTime
+     * @return [{product:'xx', mestype:'xx', cost:123}]
+     */
+    public List<Map<String, Object>> getDelayByMsgType(String beginTime, String endTime) {
+
+        String sql = "select DISTINCT h1.messageId, h1.product, h1.mestype, (CAST(h2.recTime as NUMERIC)-CAST(h1.recTime as NUMERIC)) cost\n" +
+                "from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+                "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
+                "AND h2.phoneCaption is not null and h2.product is not null\n" +
+                "AND h1.actionType='SEND' and h1.success='TRUE' and h2.actionType='RECEIVE'\n" +
+                "AND CAST(h1.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+                "ORDER BY h1.product, h1.mestype, cost ASC";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql,beginTime, endTime);
+        if (maps == null) {
+            maps = new ArrayList<>();
+        }
+        return maps;
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println(defaultBeginTime);
+        System.out.println(defaultEndTime);
+
+    }
 }
 /*
-
-select h1.product, h1.phoneCaption, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost from hxData h1 join hxData h2 on h1.messageId = h2.messageId
+-- 根据渠道获取发送延迟
+select h1.product, h1.channel, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost from hxData h1 join hxData h2 on h1.messageId = h2.messageId
 WHERE h1.phoneCaption is not null and h1.product is not null
 AND h2.phoneCaption is not null and h2.product is not null
-AND CAST(h1.recTime2 as DATETIME) BETWEEN CAST('2015-05-12 12:12:12' as DATETIME) AND CAST('2015-05-14 23:00:00' as DATETIME)
-ORDER BY h1.product, h1.phoneCaption, cost ASC
+AND CAST(h1.recTime2 as DATETIME) BETWEEN CAST('2015-05-13 00:00:00' as DATETIME) AND CAST('2015-05-15 23:59:59' as DATETIME)
+ORDER BY h1.product, h1.channel, cost ASC
 
 
-select count(*) from hxData h1 join hxData h2 on h1.messageId = h2.messageId
+-- 根据消息类型获取发送延迟
+select DISTINCT h1.messageId, h1.product, h1.mestype, (CAST(h2.recTime as NUMERIC)-CAST(h1.recTime as NUMERIC)) cost
+from hxData h1 join hxData h2 on h1.messageId = h2.messageId
 WHERE h1.phoneCaption is not null and h1.product is not null
 AND h2.phoneCaption is not null and h2.product is not null
-AND CAST(h1.recTime2 as DATETIME) BETWEEN CAST('2015-05-12 12:12:12' as DATETIME) AND CAST('2015-05-14 23:00:00' as DATETIME)
+AND h1.actionType='SEND' and h1.success='TRUE' and h2.actionType='RECEIVE'
+AND CAST(h1.recTime2 as DATETIME) BETWEEN CAST('2015-05-13 00:00:00' as DATETIME) AND CAST('2015-05-15 23:59:59' as DATETIME)
+ORDER BY h1.product, h1.mestype, cost ASC
+
+
+-- 查询发送时间 > 接收时间数据
+select h1.product, h1.channel, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost from hxData h1 join hxData h2 on h1.messageId = h2.messageId
+WHERE h1.phoneCaption is not null and h1.product is not null
+AND h2.phoneCaption is not null and h2.product is not null
+AND CAST(h1.recTime2 as DATETIME) BETWEEN CAST('2015-05-13 00:00:00' as DATETIME) AND CAST('2015-05-15 23:59:59' as DATETIME)
+ORDER BY h1.product, h1.channel, cost ASC
  */
