@@ -7,10 +7,14 @@
     <title>IM</title>
     <style type="text/css">
         .continer {
-            width: 800px;
-            height: 600px;
+            width:1000px;
+            height: 500px;
             margin: 0px auto 100px auto;
             background: #E0E0E0;
+        }
+        button {
+            width: 100px;
+            height: 30px;
         }
     </style>
     <script type="text/javascript" src="../js/highcharts/jquery-1.8.2.min.js"></script>
@@ -20,16 +24,26 @@
 </head>
 <body>
 
-<!-- 消息数量 -->
-<div id="zongShuLiang" class="continer"></div>
+    <div style="margin: 20px auto 20px auto; width: 300px;">
+        <h1 style="font-size: 30px; font-weight: bold">即时通信统计</h1>
+    </div>
+    <div style="margin: 0px auto 50px auto; width: 500px;">
+        <c:forEach items="${proNum}" var="p">
+            <button onclick="javascript:location='im/product?p=${p.product}'"> ${p.product}</button>
+        </c:forEach>
+    </div>
 
-<!-- 成功率 -->
-<div id="chengGongLv_JiXing_HX" class="continer"></div>
-<div id="chengGongLv_JiXing_RY" class="continer"></div>
-<div id="chengGongLv_JiXing_YTX" class="continer"></div>
+    <!-- 消息数量 -->
+    <div id="zongShuLiang" class="continer"></div>
 
-<div id="chengGongLv_QuDao" class="continer"></div>
-<div id="chengGongLv_LeiXing" class="continer"></div>
+    <!-- 失败率 -->
+    <div id="chengGongLv" class="continer"></div>
+
+    <!-- 丢包率 -->
+    <div id="diuBaoLv" class="continer"></div>
+
+    <!-- 延迟 -->
+    <div id="yanChi" class="continer"></div>
 </body>
 
 
@@ -108,97 +122,211 @@
     });
 </script>
 
-
-<!-- 机型失败率-环信 -->
+<!-- 失败率 -->
 <script type="text/javascript">
-//    var products = [];
-    var hxData = [];
-    var phones = [];
+    var products = [];
+    var data = [];
 
-
-    <%--<c:forEach items="${names}" var="n">--%>
-        <%--products.push('${n.key}')--%>
-    <%--</c:forEach>--%>
+    <c:forEach items="${products}" var="p">
+        products.push('${p}');
+    </c:forEach>
 
     <c:forEach items="${data}" var="d">
-        <c:if test="${d.key eq 'HX'}">
-            <c:forEach items="${d.value}" var="v">
-                var obj = {};
-                obj.name = '${v.name}';
-                obj.data = [];
-                <c:forEach items="${v.data}" var="dd">
-                    obj.data.push(${dd});
-                </c:forEach>
-                hxData.push(obj);
-            </c:forEach>
-        </c:if>
+        var obj = {};
+        obj.name = '${d.name}';
+        obj.data = [];
+        <c:forEach items="${d.data}" var="dd">
+            obj.data.push(${dd});
+        </c:forEach>
+        data.push(obj);
     </c:forEach>
 
 
-    <c:forEach items="${phones}" var="p">
-        <c:if test="${p.key eq 'HX'}">
-            <c:forEach items="${p.value}" var="v">
-                phones.push('${v}');
-            </c:forEach>
-        </c:if>
-    </c:forEach>
-
-
-
-$(function () {
-    $('#chengGongLv_JiXing_HX').highcharts({
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'Stacked column chart'
-        },
-        xAxis: {
-            categories: phones
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Total fruit consumption'
+    $(function () {
+        $('#chengGongLv').highcharts({
+            chart: {
+                type: 'column'
             },
-            stackLabels: {
-                enabled: true,
-                style: {
-                    fontWeight: 'bold',
-                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-                }
-            }
-        },
-        legend: {
-            align: 'right',
-            x: -70,
-            verticalAlign: 'top',
-            y: 20,
-            floating: true,
-            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
-            borderColor: '#CCC',
-            borderWidth: 1,
-            shadow: false
-        },
-        tooltip: {
-            formatter: function() {
-                return '<b>'+ this.x +'</b><br/>'+
-                        this.series.name +': '+ this.y +'<br/>'+
-                        'Total: '+ this.point.stackTotal;
-            }
-        },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                dataLabels: {
+            title: {
+                text: '失败率(发送数量/发送成功数量)'
+            },
+            colors: ['#f7a35c', '#8085e9', '#f15c80', '#e4d354', '#8085e8', '#8d4653', '#91e8e1'],
+            xAxis: {
+                categories: products
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Total fruit consumption'
+                },
+                stackLabels: {
                     enabled: true,
-                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    }
                 }
-            }
-        },
-        series: hxData
+            },
+            legend: {
+                align: 'right',
+                x: -70,
+                verticalAlign: 'top',
+                y: 20,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                            this.series.name +': '+ this.y +'<br/>'+
+                            'Total: '+ this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                    }
+                }
+            },
+            series: data
+        });
     });
-});
 </script>
 
+<!-- 丢包率 -->
+<script type="text/javascript">
+    var data2 = [];
+
+    <c:forEach items="${data2}" var="d">
+        var obj = {};
+        obj.name = '${d.name}';
+        obj.data = [];
+        <c:forEach items="${d.data}" var="dd">
+            obj.data.push(${dd});
+        </c:forEach>
+        data2.push(obj);
+    </c:forEach>
+    $(function () {
+        $('#diuBaoLv').highcharts({
+            chart: {
+                type: 'column'
+            },
+            colors: ['#e4d354', '#8085e8', '#8d4653', '#91e8e1'],
+            title: {
+                text: '丢包率(发送成功/对方接收)'
+            },
+            xAxis: {
+                categories: products
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Total fruit consumption'
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    }
+                }
+            },
+            legend: {
+                align: 'right',
+                x: -70,
+                verticalAlign: 'top',
+                y: 20,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                            this.series.name +': '+ this.y +'<br/>'+
+                            'Total: '+ this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                    }
+                }
+            },
+            series: data2
+        });
+    });
+</script>
+
+<!-- 延迟 -->
+<script type="text/javascript">
+    var data3 = [];
+
+    <c:forEach items="${data3}" var="d">
+        var obj = {};
+        obj.name = '${d.name}';
+        obj.data = [];
+        <c:forEach items="${d.data}" var="dd">
+            obj.data.push(${dd});
+        </c:forEach>
+        data3.push(obj);
+    </c:forEach>
+    $(function () {
+        $('#yanChi').highcharts({
+            chart: { type: 'bar'},
+            title: {
+                text: '延迟'
+            },
+            subtitle: {
+                text: '单位:ms'
+            },
+            xAxis: {
+                categories: products,
+                title: {
+                    text: '延迟统计,单位(ms)'
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Population (ms)',
+                    align: 'high'
+                },
+                labels: { overflow: 'justify'}
+            },
+            tooltip: { valueSuffix: ' '},
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true
+                    }
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -40,
+                y: 100,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor: '#FFFFFF',
+                shadow: true
+            },
+            credits: { enabled: false},
+            series: data3
+        });
+    });
+</script>
 </html>

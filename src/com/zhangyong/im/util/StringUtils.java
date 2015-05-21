@@ -113,4 +113,30 @@ public class StringUtils {
         }
         return buffer.toString();
     }
+
+
+    //  int------------------------------------------------------------------------------------------------
+    public static int getIntDefault0(Object obj) {
+        int value = 0;
+        if (obj == null) {
+            return value;
+        }
+        try {
+            value = Integer.valueOf(obj.toString());
+        } catch (NumberFormatException e) { }
+        return value;
+    }
+    public static int getInt(Object obj, int defaultValue) {
+        int value = defaultValue;
+        if (obj == null) {
+            return value;
+        }
+        try {
+            value = Integer.valueOf(obj.toString());
+        } catch (NumberFormatException e) { }
+        return value;
+    }
+
 }
+
+
