@@ -27,14 +27,14 @@ public class IMJdbcTemplate{
 
     static {
         Calendar begin = Calendar.getInstance();
-        begin.add(Calendar.DAY_OF_MONTH, -1);
+//        begin.add(Calendar.DAY_OF_MONTH, -1);
         begin.set(Calendar.HOUR_OF_DAY, 0);
         begin.set(Calendar.MINUTE, 0);
         begin.set(Calendar.SECOND, 0);
         defaultBeginTime = DateUtil.getHumanReadStr(begin.getTime());
 
         Calendar end = Calendar.getInstance();
-        end.add(Calendar.DAY_OF_MONTH, -1);
+//        end.add(Calendar.DAY_OF_MONTH, -1);
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
@@ -185,137 +185,6 @@ public class IMJdbcTemplate{
         return list;
     }
 
-//    /**
-//     * 获取产品, 手机型号的发送数量
-//     * @param product
-//     * @param beginTime
-//     * @param endTime
-//     * @return [{product:'XX',phoneCaption:'XX',totalNum:XX},{}]
-//     */
-//    public List<Map<String, Object>> getSendsByProductPhone(String product,String beginTime, String endTime) {
-//
-//        String sql = "select product, phoneCaption, count(*) totalNum from hxData \n" +
-//                "where phoneCaption is not null and product is not null \n" +
-//                "and CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
-//                "AND actionType='SEND'\n" +
-//                "GROUP BY product, phoneCaption order by product";
-//        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, beginTime, endTime);
-//        if (maps == null) {
-//            maps = new ArrayList<>();
-//        }
-//        return maps;
-//    }
-//
-//
-//    /**
-//     * 获取产品, 手机型号的发送成功数量
-//     * int successFlag
-//     * @param beginTime
-//     * @param endTime
-//     * @return [{product:'XX',phoneCaption:'XX',totalNum:XX},{}]
-//     */
-//    public int getSuccessByProductPhone(String product, String phone, String beginTime, String endTime) {
-//        String sql = "select count(*) totalNum from hxData \n" +
-//                "where phoneCaption is not null and product is not null \n" +
-//                "AND product=? AND phoneCaption=?\n" +
-//                "and CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
-//                "AND actionType='SEND' and success = 'TRUE'\n" +
-//                "GROUP BY product, phoneCaption order by product;";
-//        List<Integer> integers = jdbcTemplate.queryForList(sql, Integer.class, product, phone, beginTime, endTime);
-//        int successNums = 0;
-//        if (integers != null && integers.size() > 0 && integers.get(0) != null) {
-//            successNums = integers.get(0);
-//        }
-//        return successNums;
-//    }
-//
-//
-//    /**
-//     * 获取产品, 渠道的发送成功/失败数量
-//     * @param successFlag
-//     * @param beginTime
-//     * @param endTime
-//     * @return [{product:'XX',channel:'XX',totalNum:XX},{}]
-//     */
-//    public List<Map<String, Object>> getTotalByChannel(int successFlag, String beginTime, String endTime) {
-//        String success = null;
-//        if (successFlag == Constants.SUCCESS_TRUE) {
-//            success = "TRUE";
-//        }else if (successFlag == Constants.SUCCESS_FALSE) {
-//            success = "FALSE";
-//        }
-//
-//        String sql = "select product, channel, count(*) totalNum from hxData where success = ? and phoneCaption is not null " +
-//                " and product is not null and CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) " +
-//                " AND CAST(? as DATETIME) GROUP BY product,channel ORDER BY product";
-//        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, success, beginTime, endTime);
-//        if (maps == null) {
-//            maps = new ArrayList<>();
-//        }
-//        return maps;
-//    }
-//
-//
-//    /**
-//     * 获取产品, 渠道的发送总数量
-//     * @param beginTime
-//     * @param endTime
-//     * @return [{product:'XX',channel:'XX',totalNum:XX},{}]
-//     */
-//    public List<Map<String, Object>> getTotalByChannel(String beginTime, String endTime) {
-//
-//        String sql = "select product, channel, count(*) totalNum from hxData where phoneCaption is not null " +
-//                " and product is not null and CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) " +
-//                " AND CAST(? as DATETIME) GROUP BY product,channel ORDER BY product";
-//        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, beginTime, endTime);
-//        if (maps == null) {
-//            maps = new ArrayList<>();
-//        }
-//        return maps;
-//    }
-//
-//
-//    /**
-//     * 根据消息 类型获取发送成功/失败数量
-//     * @param successFlag
-//     * @param beginTime
-//     * @param endTime
-//     * @return [{product:'XX',mestype:'XX',totalNum:XX},{}]
-//     */
-//    public List<Map<String, Object>> getTotalByMsgType(int successFlag, String beginTime, String endTime) {
-//        String success = null;
-//        if (successFlag == Constants.SUCCESS_TRUE) {
-//            success = "TRUE";
-//        }else if (successFlag == Constants.SUCCESS_FALSE) {
-//            success = "FALSE";
-//        }
-//
-//        String sql = "select product, mestype , count(*) totalNum from hxData WHERE success = ? " +
-//                "and phoneCaption is not null and product is not null and CAST(recTime2 as DATETIME) " +
-//                "BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME) GROUP BY product,mestype ORDER BY product;";
-//        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, success,beginTime, endTime);
-//        if (maps == null) {
-//            maps = new ArrayList<>();
-//        }
-//        return maps;
-//    }
-//
-//    /**
-//     * 根据消息 类型获取发送总数量
-//     * @param beginTime
-//     * @param endTime
-//     * @return [{product:'XX',mestype:'XX',totalNum:XX},{}]
-//     */
-//    public List<Map<String, Object>> getTotalByMsgType(String beginTime, String endTime) {
-//        String sql = "select product, mestype , count(*) totalNum from hxData WHERE  " +
-//                " phoneCaption is not null and product is not null and CAST(recTime2 as DATETIME) " +
-//                " BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME) GROUP BY product,mestype ORDER BY product;";
-//        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, beginTime, endTime);
-//        if (maps == null) {
-//            maps = new ArrayList<>();
-//        }
-//        return maps;
-//    }
 
 
         /**

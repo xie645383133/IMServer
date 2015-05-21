@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <html>
 <head>
-    <title>${product}</title>
+    <title>${product} 发送失败统计</title>
     <style type="text/css">
       .continer {
         width:1000px;

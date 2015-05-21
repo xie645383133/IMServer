@@ -16,6 +16,9 @@
             width: 100px;
             height: 30px;
         }
+        hr{
+            margin-bottom: 20px; margin-top: 20px;
+        }
     </style>
     <script type="text/javascript" src="../js/highcharts/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" src="../js/highcharts/highcharts.js"></script>
@@ -28,8 +31,23 @@
         <h1 style="font-size: 30px; font-weight: bold">即时通信统计</h1>
     </div>
     <div style="margin: 0px auto 50px auto; width: 500px;">
+        <strong>发送失败统计：</strong>
         <c:forEach items="${proNum}" var="p">
-            <button onclick="javascript:location='im/product?p=${p.product}'"> ${p.product}</button>
+            <button onclick="javascript:location='im/fail?p=${p.product}'"> ${p.product}</button>
+        </c:forEach>
+
+        <hr>
+
+        <strong>丢包统计：　　</strong>
+        <c:forEach items="${proNum}" var="p">
+            <button onclick="javascript:location='im/lost?p=${p.product}'"> ${p.product}</button>
+        </c:forEach>
+
+        <hr>
+
+        <strong>延迟失败统计：</strong>
+        <c:forEach items="${proNum}" var="p">
+            <button onclick="javascript:location='im/delay?p=${p.product}'"> ${p.product}</button>
         </c:forEach>
     </div>
 

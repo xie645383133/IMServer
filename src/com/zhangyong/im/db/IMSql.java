@@ -5,18 +5,17 @@ package com.zhangyong.im.db;
  */
 public class IMSql {
 
-    // 渠道
-    public static final String GET_SENDS_BY_CHANNEL =
+    // 失败率
+    public static final String BAI_SEND_CHANNEL =
             "SELECT channel, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ?\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY channel";
-    public static final String GET_SENDS_SUCCESS_BY_CHANNEL =
+    public static final String BAI_SUCCESS_CHANNEL =
             "SELECT channel, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ? AND success='TRUE'\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY channel;";
-
     public static final String GET_CHANNELS =
             "SELECT channel from hxData\n" +
             "WHERE  phoneCaption is not null and product is not null and reSendTimes is not null\n" +
@@ -26,21 +25,18 @@ public class IMSql {
 
 
 
-    // 机型
     public static final String GET_PHONES=
             "SELECT phoneCaption from hxData\n" +
             "WHERE  phoneCaption is not null and product is not null and reSendTimes is not null\n" +
             "AND actionType='SEND' AND product = ?\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY phoneCaption";
-
-    public static final String GET_SEND_BY_PHONE =
+    public static final String BAI_SEND_PHONE =
             "select phoneCaption, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ?\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY phoneCaption";
-
-    public static final String GET_SEND_SUCCESS_BY_PHONES =
+    public static final String BAI_SUCCESS_PHONE =
             "select phoneCaption, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ? AND success='TRUE'\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
@@ -48,21 +44,16 @@ public class IMSql {
 
 
 
-
-        // 消息 类型
-    public static final String GET_SEND_BY_MSGTYPE =
+    public static final String BAI_SEND_TYPE =
             "select mestype, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ?\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY mestype";
-
-
-    public static final String GET_SUCCESS_BY_MSGTYPE =
+    public static final String BAI_SUCCESS_TYPE =
             "select mestype, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ? AND success='TRUE'\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY mestype";
-
     public static final String GET_MSGTYPE =
             "SELECT mestype from hxData\n" +
             "WHERE  phoneCaption is not null and product is not null and reSendTimes is not null\n" +
@@ -70,5 +61,108 @@ public class IMSql {
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY mestype";
 
+
+
+
+    // 丢包率
+
+    public static final String DIU_SEND_PHONE =
+            "SELECT phoneCaption, count(*) totalNum from hxData\n" +
+            "WHERE phoneCaption is not null and product is not null and reSendTimes is not null\n" +
+            "AND actionType='SEND' and success ='TRUE'\n" +
+            "AND product=? \n" +
+            "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "GROUP BY phoneCaption ORDER BY phoneCaption";
+    public static final String DIU_RECEIVE_PHONE =
+            "SELECT h2.phoneCaption, count(*) totalNum FROM hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+            "WHERE h1.phoneCaption is not null and h1.product is not null and h1.reSendTimes is not null\n" +
+            "AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
+            "AND h1.actionType='RECEIVE' AND h2.product=?\n" +
+            "AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "GROUP BY h2.phoneCaption ORDER BY h2.phoneCaption";
+
+
+
+    public static final String DIU_SEND_CHANNEL =
+            "SELECT channel, count(*) totalNum from hxData\n" +
+            "WHERE phoneCaption is not null and product is not null and reSendTimes is not null\n" +
+            "AND actionType='SEND' and success ='TRUE'\n" +
+            "AND product=? \n" +
+            "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "GROUP BY channel ORDER BY channel";
+    public static final String DIU_RECEIVE_CHANNEL =
+            "SELECT h2.channel, count(*) totalNum FROM hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+            "WHERE h1.phoneCaption is not null and h1.product is not null and h1.reSendTimes is not null\n" +
+            "AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
+            "AND h1.actionType='RECEIVE' AND h2.product=?\n" +
+            "AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "GROUP BY h2.channel ORDER BY h2.channel";
+
+
+    public static final String DIU_SEND_TYPE =
+            "SELECT mestype, count(*) totalNum from hxData\n" +
+            "WHERE phoneCaption is not null and product is not null and reSendTimes is not null\n" +
+            "AND actionType='SEND' and success ='TRUE'\n" +
+            "AND product=? \n" +
+            "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "GROUP BY mestype ORDER BY mestype";
+    public static final String DIU_RECEIVE_TYPE =
+            "SELECT h2.mestype, count(*) totalNum FROM hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+            "WHERE h1.phoneCaption is not null and h1.product is not null and h1.reSendTimes is not null\n" +
+            "AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
+            "AND h1.actionType='RECEIVE' AND h2.product=?\n" +
+            "AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "GROUP BY h2.mestype ORDER BY h2.mestype";
+
+
+    // 延时
+    public static final String YAN_PHONE =
+            "select DISTINCT h1.messageId,h1.phoneCaption, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
+            "from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+            "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
+            "AND h2.phoneCaption is not null and h2.product is not null\n" +
+            "AND h1.product=?\n" +
+            "AND h1.actionType='RECEIVE' AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
+            "AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "ORDER by h1.phoneCaption, cost ASC";
+
+    public static final String YAN_CHANNEL =
+            "select DISTINCT h1.messageId,h1.channel, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
+            "from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+            "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
+            "AND h2.phoneCaption is not null and h2.product is not null\n" +
+            "AND h1.product=?\n" +
+            "AND h1.actionType='RECEIVE' AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
+            "AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "ORDER by h1.channel, cost ASC";
+    public static final String YAN_TYPE =
+            "select DISTINCT h1.messageId,h1.mestype, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
+            "from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
+            "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
+            "AND h2.phoneCaption is not null and h2.product is not null\n" +
+            "AND h1.product=?\n" +
+            "AND h1.actionType='RECEIVE' AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
+            "AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+            "ORDER by h1.mestype, cost ASC";
+
+
+    /*
+    SELECT phoneCaption, count(*) totalNum from hxData
+WHERE phoneCaption is not null and product is not null and reSendTimes is not null
+AND actionType='SEND' and success ='TRUE'
+AND CAST(recTime2 as DATETIME) BETWEEN CAST('2015-05-20 00:00:00' as DATETIME) AND CAST('2015-05-20 23:59:59' as DATETIME)
+AND product='HX'
+GROUP BY phoneCaption ORDER BY phoneCaption;
+
+
+
+
+SELECT h2.phoneCaption, count(*) totalNum FROM hxData h1 join hxData h2 on h1.messageId = h2.messageId
+WHERE h1.phoneCaption is not null and h1.product is not null and h1.reSendTimes is not null
+AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST('2015-05-20 00:00:00' as DATETIME) AND CAST('2015-05-20 23:59:59' as DATETIME)
+AND h2.actionType='SEND' AND h2.success='TRUE'
+AND h1.actionType='RECEIVE' AND h2.product='HX'
+GROUP BY h2.phoneCaption ORDER BY h2.phoneCaption;
+     */
 
 }
