@@ -17,14 +17,15 @@
     <script type="text/javascript" src="../js/highcharts/exporting.js"></script>
 </head>
 <body>
+    <jsp:include page="search_box.jsp"/>
     <!-- 失败率-机型 -->
-    <div id="shiBai_jiXing" class="continer"></div>
+    <div id="fail_phone" class="continer"></div>
 
     <!-- 失败率-平台 -->
-    <div id="shiBai_pingTai" class="continer"></div>
+    <div id="fail_channel" class="continer"></div>
 
     <!-- 失败率-消息类型 -->
-    <div id="shiBai_leiXing" class="continer"></div>
+    <div id="fail_msgType" class="continer"></div>
 
 </body>
 
@@ -53,7 +54,7 @@
 
 
   $(function () {
-      $('#shiBai_jiXing').highcharts({
+      $('#fail_phone').highcharts({
         chart: {
           type: 'column'
         },
@@ -130,7 +131,7 @@
     </c:forEach>
 
     $(function () {
-        $('#shiBai_pingTai').highcharts({
+        $('#fail_channel').highcharts({
             chart: {
                 type: 'column'
             },
@@ -209,7 +210,7 @@
     </c:forEach>
 
     $(function () {
-        $('#shiBai_leiXing').highcharts({
+        $('#fail_msgType').highcharts({
             chart: {
                 type: 'column'
             },

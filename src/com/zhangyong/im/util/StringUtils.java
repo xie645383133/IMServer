@@ -1,10 +1,16 @@
 package com.zhangyong.im.util;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by zhangyong on 2014/10/14.
  * 字符串工具类
  */
 public class StringUtils {
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	public static final boolean isNull(String str) {
 		return str == null;
@@ -137,6 +143,50 @@ public class StringUtils {
         return value;
     }
 
+    // date -----------------------------------------------------------------------------------------------
+
+    public static String addBeginHms(String ymd) {
+        String date = null;
+        if (validDateStr(ymd)) {
+            date = ymd + " 00:00:00";
+        }
+        return date;
+    }
+
+    public static String addEndHms(String ymd) {
+        String date = null;
+        if (validDateStr(ymd)) {
+            date = ymd + " 23:59:59";
+        }
+        return date;
+    }
+
+    private static boolean validDateStr(String ymd) {
+        boolean validDateStr = true;
+        try{
+            DATE_FORMAT.parse(ymd);
+        } catch (Exception e) {
+            validDateStr = false;
+        }
+        return validDateStr;
+    }
+
+    public static boolean endGtBegin(String begin, String end) {
+        Date b = parseDate(begin);
+        Date e = parseDate(end);
+        if (b == null || e == null) {
+            return false;
+        }
+        return e.getTime() > b.getTime();
+    }
+
+    private static Date parseDate(String ymd) {
+        Date date = null;
+        try{
+            date = DATE_FORMAT.parse(ymd);
+        } catch (Exception e) { }
+        return date;
+    }
 }
 
 

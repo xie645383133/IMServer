@@ -6,12 +6,12 @@ package com.zhangyong.im.db;
 public class IMSql {
 
     // 失败率
-    public static final String BAI_SEND_CHANNEL =
+    public static final String FAIL_SEND_CHANNEL =
             "SELECT channel, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ?\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY channel";
-    public static final String BAI_SUCCESS_CHANNEL =
+    public static final String FAIL_SUCCESS_CHANNEL =
             "SELECT channel, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ? AND success='TRUE'\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
@@ -31,12 +31,12 @@ public class IMSql {
             "AND actionType='SEND' AND product = ?\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY phoneCaption";
-    public static final String BAI_SEND_PHONE =
+    public static final String FAIL_SEND_PHONE =
             "select phoneCaption, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ?\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY phoneCaption";
-    public static final String BAI_SUCCESS_PHONE =
+    public static final String FAIL_SUCCESS_PHONE =
             "select phoneCaption, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ? AND success='TRUE'\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
@@ -44,12 +44,12 @@ public class IMSql {
 
 
 
-    public static final String BAI_SEND_TYPE =
+    public static final String FAIL_SEND_TYPE =
             "select mestype, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ?\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY mestype";
-    public static final String BAI_SUCCESS_TYPE =
+    public static final String FAIL_SUCCESS_TYPE =
             "select mestype, count(*) totalNum from hxData WHERE product is not null \n" +
             "AND actionType='SEND' AND product = ? AND success='TRUE'\n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
@@ -66,14 +66,14 @@ public class IMSql {
 
     // 丢包率
 
-    public static final String DIU_SEND_PHONE =
+    public static final String LOST_SEND_PHONE =
             "SELECT phoneCaption, count(*) totalNum from hxData\n" +
             "WHERE phoneCaption is not null and product is not null and reSendTimes is not null\n" +
             "AND actionType='SEND' and success ='TRUE'\n" +
             "AND product=? \n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY phoneCaption ORDER BY phoneCaption";
-    public static final String DIU_RECEIVE_PHONE =
+    public static final String LOST_RECEIVE_PHONE =
             "SELECT h2.phoneCaption, count(*) totalNum FROM hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
             "WHERE h1.phoneCaption is not null and h1.product is not null and h1.reSendTimes is not null\n" +
             "AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
@@ -83,14 +83,14 @@ public class IMSql {
 
 
 
-    public static final String DIU_SEND_CHANNEL =
+    public static final String LOST_SEND_CHANNEL =
             "SELECT channel, count(*) totalNum from hxData\n" +
             "WHERE phoneCaption is not null and product is not null and reSendTimes is not null\n" +
             "AND actionType='SEND' and success ='TRUE'\n" +
             "AND product=? \n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY channel ORDER BY channel";
-    public static final String DIU_RECEIVE_CHANNEL =
+    public static final String LOST_RECEIVE_CHANNEL =
             "SELECT h2.channel, count(*) totalNum FROM hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
             "WHERE h1.phoneCaption is not null and h1.product is not null and h1.reSendTimes is not null\n" +
             "AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
@@ -99,14 +99,14 @@ public class IMSql {
             "GROUP BY h2.channel ORDER BY h2.channel";
 
 
-    public static final String DIU_SEND_TYPE =
+    public static final String LOST_SEND_TYPE =
             "SELECT mestype, count(*) totalNum from hxData\n" +
             "WHERE phoneCaption is not null and product is not null and reSendTimes is not null\n" +
             "AND actionType='SEND' and success ='TRUE'\n" +
             "AND product=? \n" +
             "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "GROUP BY mestype ORDER BY mestype";
-    public static final String DIU_RECEIVE_TYPE =
+    public static final String LOST_RECEIVE_TYPE =
             "SELECT h2.mestype, count(*) totalNum FROM hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
             "WHERE h1.phoneCaption is not null and h1.product is not null and h1.reSendTimes is not null\n" +
             "AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
@@ -116,8 +116,8 @@ public class IMSql {
 
 
     // 延时
-    public static final String YAN_PHONE =
-            "select DISTINCT h1.messageId,h1.phoneCaption, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
+    public static final String DELAY_PHONE =
+            "select DISTINCT h1.messageId,h1.phoneCaption itype, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
             "from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
             "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
             "AND h2.phoneCaption is not null and h2.product is not null\n" +
@@ -126,8 +126,8 @@ public class IMSql {
             "AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "ORDER by h1.phoneCaption, cost ASC";
 
-    public static final String YAN_CHANNEL =
-            "select DISTINCT h1.messageId,h1.channel, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
+    public static final String DELAY_CHANNEL =
+            "select DISTINCT h1.messageId,h1.channel itype, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
             "from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
             "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
             "AND h2.phoneCaption is not null and h2.product is not null\n" +
@@ -135,8 +135,8 @@ public class IMSql {
             "AND h1.actionType='RECEIVE' AND h2.actionType='SEND' AND h2.success='TRUE'\n" +
             "AND CAST(h2.recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
             "ORDER by h1.channel, cost ASC";
-    public static final String YAN_TYPE =
-            "select DISTINCT h1.messageId,h1.mestype, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
+    public static final String DELAY_TYPE =
+            "select DISTINCT h1.messageId,h1.mestype itype, (CAST(h1.recTime as NUMERIC)-CAST(h2.recTime as NUMERIC)) cost \n" +
             "from hxData h1 join hxData h2 on h1.messageId = h2.messageId\n" +
             "WHERE h1.phoneCaption is not null and h1.product is not null\n" +
             "AND h2.phoneCaption is not null and h2.product is not null\n" +

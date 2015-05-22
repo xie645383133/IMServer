@@ -19,6 +19,14 @@
         hr{
             margin-bottom: 20px; margin-top: 20px;
         }
+        a {
+            font-size: 30px;
+            font-weight: bold;
+            margin-right: 30px;
+            /*background: #C0C0C0;*/
+            /*width: 100px;*/
+            /*height: 30px;*/
+        }
     </style>
     <script type="text/javascript" src="../js/highcharts/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" src="../js/highcharts/highcharts.js"></script>
@@ -27,27 +35,33 @@
 </head>
 <body>
 
-    <div style="margin: 20px auto 20px auto; width: 300px;">
+    <div style="margin: 20px auto 0px auto; width: 300px;">
         <h1 style="font-size: 30px; font-weight: bold">即时通信统计</h1>
     </div>
+
+
+
+
+
     <div style="margin: 0px auto 50px auto; width: 500px;">
+        <jsp:include page="search_box.jsp"/>
         <strong>发送失败统计：</strong>
         <c:forEach items="${proNum}" var="p">
-            <button onclick="javascript:location='im/fail?p=${p.product}'"> ${p.product}</button>
+            <a href="im/fail?p=${p.product}" target="_blank">${p.product}</a>
         </c:forEach>
 
         <hr>
 
         <strong>丢包统计：　　</strong>
         <c:forEach items="${proNum}" var="p">
-            <button onclick="javascript:location='im/lost?p=${p.product}'"> ${p.product}</button>
+            <a href="im/lost?p=${p.product}" target="_blank">${p.product}</a>
         </c:forEach>
 
         <hr>
 
-        <strong>延迟失败统计：</strong>
+        <strong>延迟统计：</strong>
         <c:forEach items="${proNum}" var="p">
-            <button onclick="javascript:location='im/delay?p=${p.product}'"> ${p.product}</button>
+            <a href="im/delay?p=${p.product}" target="_blank">${p.product}</a>
         </c:forEach>
     </div>
 
@@ -175,7 +189,7 @@
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Total fruit consumption'
+                    text: '失败率(发送数量/发送成功数量)'
                 },
                 stackLabels: {
                     enabled: true,
@@ -237,7 +251,7 @@
             },
             colors: ['#e4d354', '#8085e8', '#8d4653', '#91e8e1'],
             title: {
-                text: '丢包率(发送成功/对方接收)'
+                text: '丢包率(接收/丢失)'
             },
             xAxis: {
                 categories: products
@@ -245,7 +259,7 @@
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Total fruit consumption'
+                    text: '丢包率(接收/丢失)'
                 },
                 stackLabels: {
                     enabled: true,

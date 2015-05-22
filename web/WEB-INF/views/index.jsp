@@ -1,10 +1,4 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: zhangyong
-  Date: 2015/5/15
-  Time: 11:21
-  To change this template use File | Settings | File Templates.
---%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -25,15 +19,13 @@
             height: 60px;
         }
     </style>
-
-    <script type="text/javascript">
-
-    </script>
 </head>
 <body>
 <div class="center">
     <button style="margin-right:50px" onclick="javascript:location.href='/im';">即时通信</button>
     <button onclick="javascript:location.href='/push';">推送</button>
 </div>
+
+
 </body>
 </html>

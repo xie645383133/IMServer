@@ -1,15 +1,19 @@
 package com.zhangyong.im.controller;
 
 import com.zhangyong.im.db.IMJdbcTemplate;
+import com.zhangyong.im.util.RequestUtil;
 import com.zhangyong.im.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.zhangyong.im.db.IMJdbcTemplate.defaultBeginTime;
 import static com.zhangyong.im.db.IMJdbcTemplate.defaultEndTime;
@@ -24,10 +28,17 @@ public class HomeController {
     IMJdbcTemplate imDao;
 
     @RequestMapping("im")
-    public Model im(Model model, HttpSession session) {
-
+    public Model im(Model model, HttpServletRequest request, HttpSession session) {
+        String b = RequestUtil.getString(request, "begin");
+        String e = RequestUtil.getString(request, "end");
         String begin = defaultBeginTime;
         String end = defaultEndTime;
+
+        if (StringUtils.endGtBegin(b, e)) {
+            begin = StringUtils.addBeginHms(b);
+            end = StringUtils.addEndHms(e);
+        }
+
         List<Map<String, Object>> recordsNumByProdect = imDao.getRecordsNumByProdect(begin, end);
 
         // 总数量数据
@@ -74,9 +85,9 @@ public class HomeController {
         List<Integer> sendData = new ArrayList<>();
         List<Integer> reciData = new ArrayList<>();
 
-        send.put("name", "发送");
+        send.put("name", "接收");
         send.put("data", sendData);
-        reci.put("name", "接收");
+        reci.put("name", "丢失");
         reci.put("data", reciData);
 
         data2.add(send);
@@ -85,9 +96,10 @@ public class HomeController {
             m = successByProduct.get(i);
             s = receivesByProduct.get(i);
             int send0 = StringUtils.getIntDefault0(m.get("totalNum"));       // 发送成功总数
-            int receive = StringUtils.getIntDefault0(s.get("totalNum"));    // 对方接收总数
-            sendData.add(send0);
-            reciData.add(receive);
+            int receive = StringUtils.getIntDefault0(s.get("totalNum"));     // 对方接收总数
+            int lost = send0 - receive < 0 ? 0 : send0 - receive;
+            sendData.add(receive);
+            reciData.add(lost);
         }
 
         // 延迟
@@ -183,18 +195,17 @@ public class HomeController {
         model.addAttribute("data", data);
         model.addAttribute("data2", data2);
         model.addAttribute("data3", data3);
-        System.out.println(data3);
+        model.addAttribute("begin", begin);
+        model.addAttribute("end", end);
+        session.setAttribute("begin", begin);
+        session.setAttribute("end", end);
         return model;
     }
 
 
 
-
-
-
     @RequestMapping("push")
     public void push() {
-
 
     }
 }

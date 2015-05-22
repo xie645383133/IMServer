@@ -27,14 +27,14 @@ public class IMJdbcTemplate{
 
     static {
         Calendar begin = Calendar.getInstance();
-//        begin.add(Calendar.DAY_OF_MONTH, -1);
+        begin.add(Calendar.DAY_OF_MONTH, -2);
         begin.set(Calendar.HOUR_OF_DAY, 0);
         begin.set(Calendar.MINUTE, 0);
         begin.set(Calendar.SECOND, 0);
         defaultBeginTime = DateUtil.getHumanReadStr(begin.getTime());
 
         Calendar end = Calendar.getInstance();
-//        end.add(Calendar.DAY_OF_MONTH, -1);
+        end.add(Calendar.DAY_OF_MONTH, -2);
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
