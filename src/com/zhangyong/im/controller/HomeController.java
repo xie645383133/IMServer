@@ -29,14 +29,15 @@ public class HomeController {
 
     @RequestMapping("im")
     public Model im(Model model, HttpServletRequest request, HttpSession session) {
-        String b = RequestUtil.getString(request, "begin");
-        String e = RequestUtil.getString(request, "end");
-        String begin = defaultBeginTime;
-        String end = defaultEndTime;
+        String begin = RequestUtil.getString(request, "begin");
+        String end = RequestUtil.getString(request, "end");
 
-        if (StringUtils.endGtBegin(b, e)) {
-            begin = StringUtils.addBeginHms(b);
-            end = StringUtils.addEndHms(e);
+        if (StringUtils.endGtBegin(begin, end)) {
+            begin = StringUtils.addBeginHms(begin);
+            end = StringUtils.addEndHms(end);
+        }else{
+            begin = defaultBeginTime;
+            end = defaultEndTime;
         }
 
         List<Map<String, Object>> recordsNumByProdect = imDao.getRecordsNumByProdect(begin, end);
@@ -78,6 +79,7 @@ public class HomeController {
 
 
         List<Map<String, Object>> receivesByProduct = imDao.getReceivesByProduct(begin, end);   // 对方接收成功
+
         // 丢包率
         List<Map<String, Object>> data2 = new ArrayList<>();
         Map<String, Object> send = new HashMap<>();
@@ -189,6 +191,8 @@ public class HomeController {
                 }
             }
         }
+
+        // 重发次数
 
         model.addAttribute("proNum", recordsNumByProdect);
         model.addAttribute("products", products);

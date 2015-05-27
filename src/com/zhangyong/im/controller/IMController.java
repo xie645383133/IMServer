@@ -96,13 +96,17 @@ public class IMController {
         }
 
         // 默认时间
-        String b = RequestUtil.getString(request, "begin");
-        String e = RequestUtil.getString(request, "end");
-        String begin = defaultBeginTime;
-        String end = defaultEndTime;
-        if (StringUtils.endGtBegin(b, e)) {
-            begin = StringUtils.addBeginHms(b);
-            end = StringUtils.addEndHms(e);
+        String begin = RequestUtil.getString(request, "begin");
+        String end = RequestUtil.getString(request, "end");
+
+        System.out.println("be:" + begin + ",en:" + end);
+
+        if (StringUtils.endGtBegin(begin, end)) {
+            begin = StringUtils.addBeginHms(begin);
+            end = StringUtils.addEndHms(end);
+        }else{
+            begin = defaultBeginTime;
+            end = defaultEndTime;
         }
 
 

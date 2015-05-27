@@ -146,6 +146,13 @@ public class IMSql {
             "ORDER by h1.mestype, cost ASC";
 
 
+    public static final String RESEND_RECORD = "SELECT product, resendTimes, actionType, success , channel from hxData \n" +
+        "WHERE product is not null AND reSendTimes is NOT NULL\n" +
+        "AND actionType = 'SEND'\n" +
+        "AND CAST(recTime2 as DATETIME) BETWEEN CAST(? as DATETIME) AND CAST(? as DATETIME)\n" +
+        "ORDER BY product, reSendTimes";
+
+
     /*
     SELECT phoneCaption, count(*) totalNum from hxData
 WHERE phoneCaption is not null and product is not null and reSendTimes is not null

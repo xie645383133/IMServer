@@ -177,7 +177,7 @@ public class StringUtils {
         if (b == null || e == null) {
             return false;
         }
-        return e.getTime() > b.getTime();
+        return e.getTime() >= b.getTime();
     }
 
     private static Date parseDate(String ymd) {

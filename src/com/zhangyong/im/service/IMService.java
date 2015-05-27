@@ -275,4 +275,13 @@ public class IMService {
 
         return data;
     }
+
+
+    public List<Map<String, Object>> getResendRecords(String begin, String end) {
+        List<Map<String, Object>> list = dao.getData(IMSql.RESEND_RECORD, begin, end);
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        return list;
+    }
 }
