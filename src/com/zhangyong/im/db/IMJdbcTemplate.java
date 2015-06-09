@@ -26,19 +26,21 @@ public class IMJdbcTemplate{
     public static String defaultEndTime;              // 默认的查询结束时间  昨天的[23:59:59]
 
     static {
-        Calendar begin = Calendar.getInstance();
-        begin.add(Calendar.DAY_OF_MONTH, -1);
-        begin.set(Calendar.HOUR_OF_DAY, 0);
-        begin.set(Calendar.MINUTE, 0);
-        begin.set(Calendar.SECOND, 0);
-        defaultBeginTime = DateUtil.getHumanReadStr(begin.getTime());
-
+//        Calendar begin = Calendar.getInstance();
+//        begin.add(Calendar.DAY_OF_MONTH, -1);
+//        begin.set(Calendar.HOUR_OF_DAY, 0);
+//        begin.set(Calendar.MINUTE, 0);
+//        begin.set(Calendar.SECOND, 0);
+//        defaultBeginTime = DateUtil.getHumanReadStr(begin.getTime());
+//
         Calendar end = Calendar.getInstance();
         end.add(Calendar.DAY_OF_MONTH, -1);
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
         defaultEndTime = DateUtil.getHumanReadStr(end.getTime());
+
+        defaultBeginTime = "2015-05-12 00:00:00";
     }
 
     /**

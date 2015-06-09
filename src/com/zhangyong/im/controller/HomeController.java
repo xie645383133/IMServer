@@ -1,6 +1,7 @@
 package com.zhangyong.im.controller;
 
 import com.zhangyong.im.db.IMJdbcTemplate;
+import com.zhangyong.im.service.PushService;
 import com.zhangyong.im.util.RequestUtil;
 import com.zhangyong.im.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ import static com.zhangyong.im.db.IMJdbcTemplate.defaultEndTime;
 public class HomeController {
     @Autowired
     IMJdbcTemplate imDao;
+    @Autowired
+    PushService pushService;
+
 
     @RequestMapping("im")
     public Model im(Model model, HttpServletRequest request, HttpSession session) {
@@ -207,9 +211,44 @@ public class HomeController {
     }
 
 
-
+    /**
+     * 推送
+     * @param model
+     * @param request
+     */
     @RequestMapping("push")
-    public void push() {
+    public void push(Model model, HttpServletRequest request) {
+        String begin = RequestUtil.getString(request, "begin");
+        String end = RequestUtil.getString(request, "end");
 
+        if (StringUtils.endGtBegin(begin, end)) {
+            begin = StringUtils.addBeginHms(begin);
+            end = StringUtils.addEndHms(end);
+        }else{
+            begin = defaultBeginTime;
+            end = defaultEndTime;
+        }
+
+        begin = "2015-06-07 00:00:00";
+        end = "2015-06-08 23:59:59";
+
+        List<Map<String, Object>> androidSend = pushService.getServerSend("ANDROID", begin, end);
+        List<Map<String, Object>> iosSend = pushService.getServerSend("IOS", begin, end);
+        List<Map<String, Object>> count = null;
+        for (Map<String, Object> map : androidSend) {
+            String key = String.valueOf(map.get("product"));
+            count = pushService.getPhoneReceive("ANDROID", key, begin, end);
+            map.put("receive", count.size());
+        }
+
+        for (Map<String, Object> map : iosSend) {
+            String key = String.valueOf(map.get("product"));
+            count = pushService.getPhoneReceive("IOS", key, begin, end);
+            map.put("receive", count.size());
+        }
+
+
+        System.out.println(androidSend);
+        System.out.println(iosSend);
     }
 }
